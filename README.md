@@ -1,8 +1,6 @@
 # Breast Cancer Masking
 
 
-## Getting Started
-
 
 ### Installation
 
@@ -11,20 +9,15 @@
 git clone [repository URL]
 ```
 
-download virtualenv package
-```
-pip install virtualenv
-```
 
 
 #### 2. Setup Environment
 - **Windows Users**: 
   - Run `.\setup.bat` by double-clicking it or through the command line.
 - **macOS/Linux Users**: 
-  - In the terminal, navigate to the project directory and run:
-    ```
-    .\setup.bat
-    ```
+  - Rename the file to setup.sh
+  - In the terminal, navigate to the project directory and run: `sh setup.sh`
+
 
 ### Using the Virtual Environment
 

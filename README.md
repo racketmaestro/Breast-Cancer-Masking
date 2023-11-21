@@ -12,28 +12,35 @@ git clone [repository URL]
 ```
 
 
-2. **Setup Environment**
-- **Windows Users**: Run `setup.bat` by double-clicking it or through the command line.
-- **macOS/Linux Users**: In the terminal, navigate to the project directory and run:
-  ```
-  sh setup.sh
-  ```
+
+#### 2. Setup Environment
+- **Windows Users**: 
+  - Run `setup.bat` by double-clicking it or through the command line.
+- **macOS/Linux Users**: 
+  - In the terminal, navigate to the project directory and run:
+    ```
+    sh setup.sh
+    ```
 
 ### Using the Virtual Environment
-To activate the virtual environment:
-- **Windows**: Run `breast_cancer_masking_venv\Scripts\activate` in the command prompt.
-- **macOS/Linux**: Run `source venv/bin/activate` in the terminal.
 
-To deactivate:
+#### To Activate the Virtual Environment:
+- **Windows**: 
+  - Run `breast_cancer_masking_venv\Scripts\activate` in the command prompt.
+- **macOS/Linux**: 
+  - Run `source breast_cancer_masking_venv/bin/activate` in the terminal.
+
+#### To Deactivate:
 - Run `deactivate` in the command prompt or terminal.
 
 ### Updating Dependencies
-- If new dependencies are added, update `requirements.txt`:
+
+- To update `requirements.txt` with new dependencies, first ensure you are in the virtual environment and then run:
 ```
-pip freeze > requirements.txt```
-
-install any new dependencies
-
+pip freeze > requirements.txt
 ```
-pip install -r requirements.txt```
 
+- To install any new dependencies, run:
+```
+pip install requirements.txt
+```

@@ -1,7 +1,7 @@
 @echo off
 
 echo Creating virtual environment...
-python -m venv breast_cancer_masking_venv
+virtualenv breast_cancer_masking_venv
 
 echo Activating virtual environment...
 call breast_cancer_masking_venv\Scripts\activate.bat

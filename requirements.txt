@@ -2,3 +2,9 @@ numpy
 pandas
 opencv-python
 pillow
+tensorflow
+scikit-learn
+seaborn
+matplotlib
+torch
+torchvision

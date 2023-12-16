@@ -39,5 +39,5 @@ pip freeze > requirements.txt
 
 - To install any new dependencies, run:
 ```
-pip install requirements.txt
+pip install -r requirements.txt
 ```

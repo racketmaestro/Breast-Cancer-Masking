@@ -52,14 +52,33 @@ def recode(data):
             hypRiskScale = 1.82
         elif hypPlas == 99:
             hypRiskScale = 1.00
-
-    # Recoding race data
-    charRace = '??'
-    raceDict = {1: "Wh", 2: "AA", 3: "HU", 4: "NA", 5: "HF", 6: "Ch", 
-                 7: "Ja", 8: "Fi", 9: "Hw", 10: "oP", 11: "oA"}
     
-    if race in raceDict:
-        charRace = raceDict[race]
+    ### hispanic RR model from San Francisco Bay Area Breast Cancer Study (SFBCS):
+    ###         (1) groups N_Biop ge 2 with N_Biop eq 1
+    ###         (2) eliminates  AgeMen from model for US Born hispanic women
+    ###         (3) group Age1st=25-29 with Age1st=20-24 and code as 1
+    ###             for   Age1st=30+, 98 (nulliparous)       code as 2
+    ###         (4) groups N_Rels=2 with N_Rels=1;
+    
+    if race in [3,5] and biopCat in [0,99]: biopCat = 0
+    elif race in [3,5] and biopCat == 2: biopCat = 1
+    elif race == 3: menCat =0
+    elif race in [3,5] and age1st != 98 and birthCat == 2: birthCat = 1
+    elif race in [3,5] and birthCat == 3: birthCat = 2
+    elif race in [3,5] and relativesCat == 2: relativesCat = 1
+
+
+    # race == 1 : "Wh"      white SEER 1983:87 BrCa Rate
+    # race == 2 : "AA"      african-american
+    # race == 3 : "HU"      hispanic-american (US born)
+    # race == 4 : "NA"      other (native american and unknown race)
+    # race == 5 : "HF"      hispanic-american (foreign born)
+    # race == 6 : "Ch"      chinese
+    # race == 7 : "Ja"      japanese
+    # race == 8 : "Fi"      filipino
+    # race == 9 : "Hw"      hawaiian
+    # race == 10 : "oP"     other pacific islander
+    # race == 11 : "oA"     other asian
         
     recodedData = pd.DataFrame({
         'T1': [T1],
@@ -69,13 +88,13 @@ def recode(data):
         'birthCat': [birthCat],
         'relativesCat': [relativesCat],
         'hypRiskScale': [hypRiskScale],
-        'charRace': [charRace]
+        'race': [race]
     })
 
     return recodedData 
 
 recodedDataFrame = recode(data)
-print(recodedDataFrame)
+print(recodedDataFrame.head())
 
 
         

@@ -52,14 +52,33 @@ def recode(data):
             hypRiskScale = 1.82
         elif hypPlas == 99:
             hypRiskScale = 1.00
-
-    # Recoding race data
-    charRace = '??'
-    raceDict = {1: "Wh", 2: "AA", 3: "HU", 4: "NA", 5: "HF", 6: "Ch", 
-                 7: "Ja", 8: "Fi", 9: "Hw", 10: "oP", 11: "oA"}
     
-    if race in raceDict:
-        charRace = raceDict[race]
+    ### hispanic RR model from San Francisco Bay Area Breast Cancer Study (SFBCS):
+    ###         (1) groups N_Biop ge 2 with N_Biop eq 1
+    ###         (2) eliminates  AgeMen from model for US Born hispanic women
+    ###         (3) group Age1st=25-29 with Age1st=20-24 and code as 1
+    ###             for   Age1st=30+, 98 (nulliparous)       code as 2
+    ###         (4) groups N_Rels=2 with N_Rels=1;
+    
+    if race in [3,5] and biopCat in [0,99]: biopCat = 0
+    elif race in [3,5] and biopCat == 2: biopCat = 1
+    elif race == 3: menCat =0
+    elif race in [3,5] and age1st != 98 and birthCat == 2: birthCat = 1
+    elif race in [3,5] and birthCat == 3: birthCat = 2
+    elif race in [3,5] and relativesCat == 2: relativesCat = 1
+
+
+    # race == 1 : "Wh"      white SEER 1983:87 BrCa Rate
+    # race == 2 : "AA"      african-american
+    # race == 3 : "HU"      hispanic-american (US born)
+    # race == 4 : "NA"      other (native american and unknown race)
+    # race == 5 : "HF"      hispanic-american (foreign born)
+    # race == 6 : "Ch"      chinese
+    # race == 7 : "Ja"      japanese
+    # race == 8 : "Fi"      filipino
+    # race == 9 : "Hw"      hawaiian
+    # race == 10 : "oP"     other pacific islander
+    # race == 11 : "oA"     other asian
         
     recodedData = pd.DataFrame({
         'T1': [T1],
@@ -69,14 +88,15 @@ def recode(data):
         'birthCat': [birthCat],
         'relativesCat': [relativesCat],
         'hypRiskScale': [hypRiskScale],
-        'charRace': [charRace]
+        'race': [race]
     })
 
     return recodedData 
-    ### set error indicator to default value of 0 for each subject
-    ## if mean not 0, implies ERROR in file
-   
-def relative_risk(data, Raw_Ind=1):
+
+recodedDataFrame = recode(data)
+print(recodedDataFrame.head())
+
+def relative_risk(data):
     # Define beta coefficients for different races
     Beta_coeffs = [
         [0.5292641686, 0.0940103059, 0.2186262218, 0.9583027845, -0.2880424830, -0.1908113865],  # White
@@ -88,37 +108,32 @@ def relative_risk(data, Raw_Ind=1):
     ]
 
     # Obtain covariates using recode_check function
-    check_cov = recode_check(data, Raw_Ind)
+    check_cov = recode(data)
 
     # Extract covariates
-    NB_Cat= check_cov.NB_Cat
-    AM_Cat = check_cov.AM_Cat
-    AF_Cat = check_cov.AF_Cat
-    NR_Cat = check_cov.NR_Cat
-    R_Hyp = check_cov.R_Hyp
-    CharRace = check_cov.CharRace
-
-    # Set NB_Cat to NaN if it is -100 or -200
-    if NB_Cat in [-100, -200]:
-        NB_Cat = np.nan
+    biopCat= check_cov.at[0,'biopCat']
+    menCat = check_cov.at[0,'menCat']
+    birthCat = check_cov.at[0,'birthCat']
+    relativesCat = check_cov.at[0,'relativesCat']
+    hypRiskScale = check_cov.at[0,'hypRiskScale']
+    race = check_cov.at[0,'race']
 
     # Calculate PatternNumber
-    if not np.isnan(NB_Cat) and not np.isnan(AM_Cat) and not np.isnan(AF_Cat) and not np.isnan(NR_Cat):
-        PatternNumber = NB_Cat * 36 + AM_Cat * 12 + AF_Cat * 3 + NR_Cat + 1
+    if not np.isnan(birthCat):
+        PatternNumber = biopCat * 36 + menCat * 12 + birthCat * 3 + relativesCat + 1
     else:
         PatternNumber = np.nan
 
-    LP1 = LP2 = np.nan
 
     # Select the appropriate beta coefficients
-    if CharRace!= "??":
-        race_index = int(data.Race.iloc[0])
-        Beta = Beta_coeffs[race_index - 1]
+    Beta = Beta_coeffs[race - 1]
 
-        # Check if all covariates are available to calculate LP1 and LP2
-        if not np.isnan(NB_Cat) and not np.isnan(AM_Cat) and not np.isnan(AF_Cat) and not np.isnan(NR_Cat) and not np.isnan(R_Hyp):
-            LP1 = NB_Cat * Beta[0] + AM_Cat * Beta[1] + AF_Cat * Beta[2] + NR_Cat * Beta[3] + AF_Cat * NR_Cat * Beta[5] + np.log(R_Hyp)
-            LP2 = LP1 + NB_Cat * Beta[4]
+    # Check if all covariates are available to calculate LP1 and LP2
+    if not np.isnan(birthCat):
+        LP1 = biopCat * Beta[0] + menCat * Beta[1] + birthCat * Beta[2] + relativesCat * Beta[3] + birthCat * relativesCat * Beta[5] + np.log(hypRiskScale)
+        LP2 = LP1 + biopCat * Beta[4]
+    else:
+        LP1 = LP2 = np.nan
 
 
     # Calculate Relative Risks
@@ -134,7 +149,4 @@ def relative_risk(data, Raw_Ind=1):
 # Assuming 'data' is a pandas Series or a one-row DataFrame representing the individual
 rr = relative_risk(data)
 print(rr)
-
-def absolute_risk(data):
-
 

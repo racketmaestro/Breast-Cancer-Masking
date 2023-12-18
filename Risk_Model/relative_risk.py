@@ -3,7 +3,7 @@ import sys
 import numpy as np
 import pandas as pd
 
-data = pd.read_csv(r"C:\Users\hanzi\PycharmProjects\Breast-Cancer-Masking\Risk_Model\BCRA_Data.csv")
+data = pd.read_csv(r"C:\Year3Project\Breast-Cancer-Masking\Risk_Model\BCRA_Data.csv")
 data.head()
 
 
@@ -148,7 +148,7 @@ r_ch = recode_check(data, Raw_Ind=1)
 print(r_ch)
 # Everything above is from the OG code
 
-def relative_risk(data, Raw_Ind=1):
+def relative_risk(data):
     # Define beta coefficients for different races
     Beta_coeffs = [
         [0.5292641686, 0.0940103059, 0.2186262218, 0.9583027845, -0.2880424830, -0.1908113865],  # White
@@ -160,7 +160,7 @@ def relative_risk(data, Raw_Ind=1):
     ]
 
     # Obtain covariates using recode_check function
-    check_cov = recode_check(data, Raw_Ind)
+    check_cov = recode_check(data)
 
     # Extract covariates
     NB_Cat= check_cov.NB_Cat
@@ -183,14 +183,13 @@ def relative_risk(data, Raw_Ind=1):
     LP1 = LP2 = np.nan
 
     # Select the appropriate beta coefficients
-    if CharRace!= "??":
-        race_index = int(data.Race.iloc[0])
-        Beta = Beta_coeffs[race_index - 1]
+    race_index = int(data.Race.iloc[0])
+    Beta = Beta_coeffs[race_index - 1]
 
-        # Check if all covariates are available to calculate LP1 and LP2
-        if not np.isnan(NB_Cat) and not np.isnan(AM_Cat) and not np.isnan(AF_Cat) and not np.isnan(NR_Cat) and not np.isnan(R_Hyp):
-            LP1 = NB_Cat * Beta[0] + AM_Cat * Beta[1] + AF_Cat * Beta[2] + NR_Cat * Beta[3] + AF_Cat * NR_Cat * Beta[5] + np.log(R_Hyp)
-            LP2 = LP1 + NB_Cat * Beta[4]
+    # Check if all covariates are available to calculate LP1 and LP2
+    if not np.isnan(NB_Cat) and not np.isnan(AM_Cat) and not np.isnan(AF_Cat) and not np.isnan(NR_Cat) and not np.isnan(R_Hyp):
+        LP1 = NB_Cat * Beta[0] + AM_Cat * Beta[1] + AF_Cat * Beta[2] + NR_Cat * Beta[3] + AF_Cat * NR_Cat * Beta[5] + np.log(R_Hyp)
+        LP2 = LP1 + NB_Cat * Beta[4]
 
 
     # Calculate Relative Risks

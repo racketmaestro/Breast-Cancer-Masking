@@ -121,17 +121,17 @@ def recode_check(data, Raw_Ind=1):
     NR_Cat[(data.Race >= 6) & (data.Race <= 11) & (NR_Cat == 2)] = 1
 
     CharRace = np.repeat('??', data.shape[0])
-    CharRace[data.Race == 1] = "Wh"      #white SEER 1983:87 BrCa Rate
-    CharRace[data.Race == 2] = "AA"      #african-american
-    CharRace[data.Race == 3] = "HU"      #hispanic-american (US born)
-    CharRace[data.Race == 4] = "NA"      #other (native american and unknown race)
-    CharRace[data.Race == 5] = "HF"      #hispanic-american (foreign born)
-    CharRace[data.Race == 6] = "Ch"      #chinese
-    CharRace[data.Race == 7] = "Ja"      #japanese
-    CharRace[data.Race == 8] = "Fi"      #filipino
-    CharRace[data.Race == 9] = "Hw"      #hawaiian
-    CharRace[data.Race == 10] = "oP"     #other pacific islander
-    CharRace[data.Race == 11] = "oA"     #other asian
+    # CharRace[data.Race == 1] = "Wh"      #white SEER 1983:87 BrCa Rate
+    # CharRace[data.Race == 2] = "AA"      #african-american
+    # CharRace[data.Race == 3] = "HU"      #hispanic-american (US born)
+    # CharRace[data.Race == 4] = "NA"      #other (native american and unknown race)
+    # CharRace[data.Race == 5] = "HF"      #hispanic-american (foreign born)
+    # CharRace[data.Race == 6] = "Ch"      #chinese
+    # CharRace[data.Race == 7] = "Ja"      #japanese
+    # CharRace[data.Race == 8] = "Fi"      #filipino
+    # CharRace[data.Race == 9] = "Hw"      #hawaiian
+    # CharRace[data.Race == 10] = "oP"     #other pacific islander
+    # CharRace[data.Race == 11] = "oA"     #other asian
 
 
 

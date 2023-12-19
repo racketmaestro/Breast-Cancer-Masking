@@ -3,7 +3,7 @@ import pandas as pd
 data = pd.read_csv("C:\\Users\\camsa\BreastCancerProject\Breast-Cancer-Masking\Risk_Model\BCRA_Data.csv")
 data.head()
 
-
+# Make sure my version of NB_Cat is correct
 def recode_check(data, Raw_Ind=1):
     ### set error indicator to default value of 0 for each subject
     ## if mean not 0, implies ERROR in file
@@ -145,7 +145,8 @@ def recode_check(data, Raw_Ind=1):
     return(recode_check)
 
 r_ch = recode_check(data, Raw_Ind=1)
-print(r_ch)
+r_ch
+
 
 def relative_risk(data,Raw_Ind=1):
     ## LN_RR, beta=lnRR, beta for NB, AM, AF, NR, AC*NB and AF*NR, from Gail/CARE model
@@ -196,8 +197,8 @@ def relative_risk(data,Raw_Ind=1):
     PatternNumber[PNID] = NB_Cat[PNID]*36+AM_Cat[PNID]*12+AF_Cat[PNID]*3+NR_Cat[PNID]*1+1
     for i in PNID:
         if CharRace[i]!="??":
-            Beta = Wrk_Beta_all[data.Race[i-1]]
-
+            Beta = Wrk_Beta_all[data.Race[i]-1]
+            
             # for woman at ages < 50
             LP1[i] = NB_Cat[i]*Beta[0]+AM_Cat[i]*Beta[1]+AF_Cat[i]*Beta[2]+NR_Cat[i]*Beta[3]+AF_Cat[i]*NR_Cat[i]*Beta[5]+np.log(R_Hyp[i])
             LP2[i] = LP1[i]+NB_Cat[i]*Beta[4]
@@ -330,6 +331,7 @@ def absolute_risk(data, Raw_Ind=1, Avg_White=0):
 
     Error_Ind = check_cov.Error_Ind.values.copy()
     IDwoERR = np.argwhere(Error_Ind==0).T[0]
+    
     for i in IDwoERR:
         obs = data[data.index==i]
         RR_Star = relative_risk(data,Raw_Ind)
@@ -351,11 +353,13 @@ def absolute_risk(data, Raw_Ind=1, Avg_White=0):
             
             # (1-AR)*RR at ages < 50
             One_AR_RR1 = One_AR1*rrstar1
+        
             # (1-AR)*RR at ages >= 50
             One_AR_RR2 = One_AR2*rrstar2
             # define One_AR_RR
             One_AR_RR[0:30] = One_AR_RR1
             One_AR_RR[30:70] = One_AR_RR2
+
             for v in range(lambda1_temp.shape[1]):
                 lambda1_temp[:,v] = Wrk_lambda1_all[int(obs.Race.values)-1,:]
                 lambda2_temp[:,v] = Wrk_lambda2_all[int(obs.Race.values)-1,:]
@@ -365,6 +369,7 @@ def absolute_risk(data, Raw_Ind=1, Avg_White=0):
         if Avg_White == 1:
              # define One_AR_RR
             One_AR_RR = np.repeat(1, 70)
+            
             for val in range(lambda1_temp.shape[1]):
                 lambda1_temp[:,val] = Wrk_lambda1_all[int(obs.Race.values)-1,:]
                 lambda2_temp[:,val] = Wrk_lambda2_all[int(obs.Race.values)-1,:]
@@ -399,6 +404,15 @@ def absolute_risk(data, Raw_Ind=1, Avg_White=0):
     return(AbsRisk)
 
 ar = absolute_risk(data)
-print("poop1")
+
+print("------------------------------------------------------------------")
+print("Recoded Data: ")
+print(r_ch)
+print("birthCat: ")
+print(r_ch.AF_Cat)
+print("relativesCat: ")
+print(r_ch.NR_Cat)
+print("Relative Risk: ")
+print(rr)
+print("Absolute Risk: ")
 print(ar)
-print("poop2")

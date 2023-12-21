@@ -1,6 +1,6 @@
 import numpy as np 
 import pandas as pd
-data = pd.read_csv(r"C:\Year3Project\Breast-Cancer-Masking\Risk_Model\BCRA_Data.csv")
+data = pd.read_csv("C:\\Users\\camsa\BreastCancerProject\Breast-Cancer-Masking\Risk_Model\BCRA_Data.csv")
 #print(data.head())
 
 def recode(data):
@@ -13,6 +13,7 @@ def recode(data):
     age1st = data.at[0, 'Age1st']
     nRels = data.at[0, 'N_Rels']
     hypPlas = data.at[0, 'HypPlas']
+    biRads = data.at[0,'BiRads']
     menCat = np.nan
     birthCat = np.nan
     relativesCat = np.nan
@@ -86,31 +87,31 @@ def recode(data):
         'birthCat': [birthCat],
         'relativesCat': [relativesCat],
         'hypRiskScale': [hypRiskScale],
-        'race': [race]
+        'race': [race],
+        'biRads' : [biRads]
     })
 
     return recodedData 
 
-
 def relative_risk(data):
     ## LN_RR, beta=lnRR, beta for NB, AM, AF, NR, AC*NB and AF*NR, from Gail/CARE model
-    White_Beta = np.array([[0.5292641686, 0.0940103059, 
-                            0.2186262218, 0.9583027845, 
-                            -0.2880424830, -0.1908113865]])
+    White_Beta = np.array([[0.3925, 0.0940103059, 
+                            0.1885, 0.701, 
+                            -0.2880424830, -0.1908113865, 0.333]])
     Black_Beta = np.array([[0.1822121131, 0.2672530336, 
-                            0.0, 0.4757242578, -0.1119411682, 0.0]])
+                            0.0, 0.4757242578, -0.1119411682, 0.0, 0.20517480951]])
     Hspnc_Beta = np.array([[0.0970783641, 0.0000000000, 
                             0.2318368334, 0.166685441, 
-                            0.0000000000, 0.0000000000]])
+                            0.0000000000, 0.0000000000, 0.4886181277]])
     FHspnc_Beta = np.array([[0.4798624017, 0.2593922322, 
                              0.4669246218, 0.9076679727, 
-                             0.0000000000, 0.0000000000]])
+                             0.0000000000, 0.0000000000, 0.9840879516]])
     Other_Beta = np.array([[0.5292641686, 0.0940103059, 
                             0.2186262218, 0.9583027845, 
-                            -0.2880424830, -0.1908113865]])
+                            -0.2880424830, -0.1908113865, 0.4607544341]])
     Asian_Beta = np.array([[0.55263612260619, 0.07499257592975, 
                             0.27638268294593, 0.79185633720481, 
-                            0.0, 0.0]])
+                            0.0, 0.0, 0.582502733]])
     Wrk_Beta_all = np.concatenate((White_Beta, Black_Beta, Hspnc_Beta, 
                                    Other_Beta, FHspnc_Beta, Asian_Beta, 
                                    Asian_Beta, Asian_Beta, Asian_Beta, 
@@ -125,19 +126,14 @@ def relative_risk(data):
     relativesCat = check_cov.at[0,'relativesCat']
     hypRiskScale = check_cov.at[0,'hypRiskScale']
     race = check_cov.at[0,'race']
-
-    # Calculate PatternNumber
-    if not np.isnan(birthCat):
-        PatternNumber = (biopCat*36) + (menCat*12) + (birthCat*3) + (relativesCat*1) + 1
-    else:
-        PatternNumber = np.nan
+    biRads = check_cov.at[0, 'biRads']
 
     # Select the appropriate beta coefficients
     Beta = Wrk_Beta_all[race-1]
 
     # Check if all covariates are available to calculate LP1 and LP2
     if not np.isnan(birthCat):
-        LP1 = biopCat * Beta[0] + menCat * Beta[1] + birthCat * Beta[2] + relativesCat * Beta[3] + birthCat * relativesCat * Beta[5] + np.log(hypRiskScale)
+        LP1 = biopCat * Beta[0] + menCat * Beta[1] + birthCat * Beta[2] + relativesCat * Beta[3] + birthCat * relativesCat * Beta[5] + np.log(hypRiskScale) + biRads * Beta [6]
         LP2 = LP1 + biopCat * Beta[4]
     else:
         LP1 = LP2 = np.nan
@@ -147,7 +143,7 @@ def relative_risk(data):
     RR_Star2 = np.exp(LP2) if not np.isnan(LP2) else np.nan
 
     # Create a DataFrame for the result
-    RR_Star = pd.DataFrame({'RR_Star1': [RR_Star1], 'RR_Star2': [RR_Star2], 'PatternNumber': [PatternNumber]})
+    RR_Star = pd.DataFrame({'RR_Star1': [RR_Star1], 'RR_Star2': [RR_Star2]})
 
     return RR_Star
 

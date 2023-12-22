@@ -97,21 +97,21 @@ def relative_risk(data):
     ## LN_RR, beta=lnRR, beta for NB, AM, AF, NR, AC*NB and AF*NR, from Gail/CARE model
     White_Beta = np.array([[0.3925, 0.0940103059, 
                             0.1885, 0.701, 
-                            -0.2880424830, -0.1908113865, 0.333]])
+                            -0.2880424830, -0.1908113865]])
     Black_Beta = np.array([[0.1822121131, 0.2672530336, 
-                            0.0, 0.4757242578, -0.1119411682, 0.0, 0.20517480951]])
+                            0.0, 0.4757242578, -0.1119411682, 0.0]])
     Hspnc_Beta = np.array([[0.0970783641, 0.0000000000, 
                             0.2318368334, 0.166685441, 
-                            0.0000000000, 0.0000000000, 0.4886181277]])
+                            0.0000000000, 0.0000000000]])
     FHspnc_Beta = np.array([[0.4798624017, 0.2593922322, 
                              0.4669246218, 0.9076679727, 
-                             0.0000000000, 0.0000000000, 0.9840879516]])
+                             0.0000000000, 0.0000000000]])
     Other_Beta = np.array([[0.5292641686, 0.0940103059, 
                             0.2186262218, 0.9583027845, 
-                            -0.2880424830, -0.1908113865, 0.4607544341]])
+                            -0.2880424830, -0.1908113865]])
     Asian_Beta = np.array([[0.55263612260619, 0.07499257592975, 
                             0.27638268294593, 0.79185633720481, 
-                            0.0, 0.0, 0.582502733]])
+                            0.0, 0.0]])
     Wrk_Beta_all = np.concatenate((White_Beta, Black_Beta, Hspnc_Beta, 
                                    Other_Beta, FHspnc_Beta, Asian_Beta, 
                                    Asian_Beta, Asian_Beta, Asian_Beta, 
@@ -133,7 +133,7 @@ def relative_risk(data):
 
     # Check if all covariates are available to calculate LP1 and LP2
     if not np.isnan(birthCat):
-        LP1 = biopCat * Beta[0] + menCat * Beta[1] + birthCat * Beta[2] + relativesCat * Beta[3] + birthCat * relativesCat * Beta[5] + np.log(hypRiskScale) + biRads * Beta [6]
+        LP1 = biopCat * Beta[0] + menCat * Beta[1] + birthCat * Beta[2] + relativesCat * Beta[3] + birthCat * relativesCat * Beta[5] + np.log(hypRiskScale)
         LP2 = LP1 + biopCat * Beta[4]
     else:
         LP1 = LP2 = np.nan
@@ -268,6 +268,7 @@ def absolute_risk(data, lifetime):
     obs = recoded_data.iloc[0]
     race = int(obs['race'])
     T1 = obs['T1']
+    biRads =obs['biRads']
     if lifetime == 1:
         T2 = 90
     else:
@@ -326,13 +327,27 @@ def absolute_risk(data, lifetime):
         Cum_lambda = Cum_lambda+lambdaj*IntgrlLngth
 
     AbsRisk = 100 * RskWrk
+
+    if biRads == 3: AbsRisk = AbsRisk * 1.6
+    elif biRads== 4: AbsRisk = AbsRisk * 2.6
+    
     return AbsRisk
 
-abs_risk_5 = absolute_risk(data, 0)
-abs_risk_lifetime = absolute_risk(data, 1)
+absRisk5 = absolute_risk(data, 0)
+absRiskLifetime = absolute_risk(data, 1)
 print('Absolute Risk (5-Year):')
-print(abs_risk_5)
+print(absRisk5)
 print('Absolute Risk (Lifetime):')
-print(abs_risk_lifetime)
+print(absRiskLifetime)
 
+riskDict = {1:"Low", 2:"Medium", 3:"High"}
+
+riskIndex5 = np.ceil(absRisk5/100 * 3)
+riskIndexLifetime= np.ceil(absRiskLifetime/100 * 3)
+
+qualRisk5 = riskDict[riskIndex5]
+qualRiskLife = riskDict[riskIndexLifetime]
+
+print("5 Year Risk: ", qualRisk5)
+print("Lifetime Risk: ", qualRiskLife)
 

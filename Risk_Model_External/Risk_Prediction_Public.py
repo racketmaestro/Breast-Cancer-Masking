@@ -11,7 +11,8 @@ with open("Risk_Model_External/Risk_Prediction.model","rb") as file:
 
 data = pd.read_csv("Risk_Model_External\BCRA_Data.csv")
 
-riskDict = riskCalc.run_model(data)
+personalRisk = riskCalc.RiskModel(data)
+riskDict = personalRisk.run_model()
 print(riskDict)
 
 

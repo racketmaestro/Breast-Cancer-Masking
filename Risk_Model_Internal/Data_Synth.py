@@ -32,13 +32,13 @@ def data_synth_norm():
     # Create and return the dictionary
     return {
         'T1': T1,
-        'biopCat': N_Biop,
-        'race': Race,
-        'ageMen': AgeMen,
-        'age1st': Age1st,
-        'nRels': N_Rels,
-        'hypPlas': HypPlas,
-        'biRads': BiRads
+        'N_Biop': N_Biop,
+        'Race': Race,
+        'AgeMen': AgeMen,
+        'Age1st': Age1st,
+        'N_Rels': N_Rels,
+        'HypPlas': HypPlas,
+        'BiRads': BiRads
     }
 
 def convert_numpy_int_to_python_int(data):
@@ -47,11 +47,14 @@ def convert_numpy_int_to_python_int(data):
             data[key] = int(value)
     return data
 
-# Generate the data
-data_dict = data_synth_norm()
+def data_gen():
+    # Generate the data
+    data_dict = data_synth_norm()
 
-# Convert NumPy integers to Python integers
-data_dict = convert_numpy_int_to_python_int(data_dict)
+    # Convert NumPy integers to Python integers
+    data_dict = convert_numpy_int_to_python_int(data_dict)
 
-with open("Risk_Model_External/BCRA_Data.json", 'w') as file:
-    json.dump(data_dict, file, indent=4)
+    with open("Risk_Model_External/BCRA_Data.json", 'w') as file:
+        json.dump(data_dict, file, indent=4)
+
+    return

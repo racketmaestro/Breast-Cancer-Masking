@@ -331,7 +331,7 @@ class RiskModel:
 
         if biRads == 3: AbsRisk = AbsRisk * 1.6
         elif biRads== 4: AbsRisk = AbsRisk * 2.6
-        
+
         return AbsRisk
 
     def run_model(self):
@@ -339,6 +339,9 @@ class RiskModel:
         absRiskLifetime = self.absolute_risk(1)
 
         riskDict = {1:"Low", 2:"Medium", 3:"High"}
+
+        if (absRisk5 >= 100):
+            absRisk5 = 100
 
         riskIndex5 = np.ceil(absRisk5/100 * 3)
         riskIndexLifetime= np.ceil(absRiskLifetime/100 * 3)
